@@ -33,7 +33,7 @@ class Bot {
     this.running.splice(completedIdx, 1)
   }
   
-  async run() {  
+  async run(res) {  
     //Initial load of tasks for bot into internal queue
     while (this.queue.length > 0 && this.activeTasks.length < this.maxTasks) {
       let currIdx = this.activeTasks.length;
@@ -41,7 +41,7 @@ class Bot {
       if (!task) break;
       this.activeTasks[currIdx] = this.runSingleTask(task, currIdx);
       
-      console.log(`${this.name} working on ${task.description}\n`)
+      res.write(`${this.name} working on ${task.description}\n`)
     }
   
     //Ongoing processing of completeing and aquiring new tasks
@@ -49,22 +49,21 @@ class Bot {
       try {
         let completed = await Promise.race(this.activeTasks)
         this.completeTask(completed.task);
-        console.log(`${this.name} completed ${completed.task.description}`)
+        res.write(`${this.name} completed ${completed.task.description}`)
   
         let nextTask = this.getNextTask();
         if(!nextTask) break;
   
         let idx = completed.index;     
         this.activeTasks[idx] = this.runSingleTask(nextTask, idx)
-        console.log(`${this.name} working on ${nextTask.description}\n`)      
+        res.write(`${this.name} working on ${nextTask.description}\n`)      
       } catch(err) {
         console.log(err)
       }
     }
     await Promise.all(this.activeTasks);
-    console.log(`\nAll tasks completed for ${this.name}`);
+    res.write(`\nAll tasks completed for ${this.name}`);
   }
-
 }
 
 module.exports = Bot

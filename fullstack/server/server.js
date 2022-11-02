@@ -10,7 +10,6 @@ const PORT = process.env.PORT || 5001;
 
 
 app.use(cors(corsOptions));
-app.use(logger);
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
