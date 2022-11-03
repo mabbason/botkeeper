@@ -20,6 +20,8 @@ into a CLI program.
 
 The CLI program is run in NodeJS by `cd` into the `cli-program` directory running `npm install` and then running `node botRunner` for each time to run the program.
 
+Doing the fullstack app was also helpful in discovering a bug in the cli-program.
+
 ## Fullstack
 
 The fullstack program is run by `cd` into `fullstack/server` folder, and run `npm install` then running `npm run dev`, this will start the server on port 5001 and restart it for changes to the backend. Keep that terminal window open while opening a second terminal to start the frontend. `cd` into `fullstack/client` folder and run `npm install` and run `npm start`. This should autimatically open a browser window with the frontend app running in it. If it doesn't, then open a browser window and navigate to `http://localhost:3000`. 
@@ -40,6 +42,12 @@ I thought I would give it a go with Material UI, having never worked with it bef
 
 This probably ended up being my biggest mistake. The project didn't really seem like it needed a "real" database so I just used a simple fs.write operation to update a json. This mostly works fine... mostly. But there is a persistent (and inconsistent) bug that I don't think will be solved unless it is hooked up to a real database. Hindsight it wouldn't have taken that long to get Mongo going, but I was trying for expediency and it cost a little in the end.
 
-### Testing
+### Additional Work
 
-The testing is definitely thin. I am not familiar with testing MUI components, or if there is even a difference so I just figured I would start by adding tests to the backend first. I never made it to the frontend for testing and even the backend is very thin. So this would definitely be a future work type thing.
+#### Testing
+
+The testing is really thin. I am not familiar with testing MUI components, or if there is even a difference from testing regular React functional components so I just figured I would start by adding tests to the backend first. I never made it to the frontend for testing and even the backend is barely there. With more time, I would definitely add more testing.
+
+#### Validation
+
+I really wanted to throw the joi validation library in here since Mike mentioned it, but I just didn't have time to go back and add it in. The validation in both apps is minimal. By minimal I mean that for inputing the bot name on the fullstack app, I force the user to only enter letter characters. Also in the cli app, the inputs are stripped out to letter characters and commas only to force a type of validation.

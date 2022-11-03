@@ -1,6 +1,6 @@
 const io = require('socket.io')(5002, {
   cors: {
-    origin: ['http://localhost:3000'],
+    origin: true,
   }
 })
 const tasksDB = {
@@ -18,10 +18,7 @@ const getAllTasks = async (req, res) => {
 io.on("connection", (socket) => {
   console.log(`New socket connection @ ${socket.id}`);
   const tasks = tasksDB.tasks;
-  if (tasks.length !== 10) {
-    console.log("Not all tasks!!!", tasks)
-  }
-
+  
   socket.on('runTaskQueue', () => {
     console.log(`Run task queue connection opened...`);
     taskQueue.run(tasks, socket);

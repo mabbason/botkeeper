@@ -3,7 +3,6 @@ const http = require('http');
 const path = require('path');
 const { errorHandler } = require('./middleware/errorHandler')
 const cors = require('cors');
-// const corsOptions = require('./config/corsOptions');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -34,7 +33,5 @@ app.all('*', (req, res) => {
 app.use(errorHandler)
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
 
 

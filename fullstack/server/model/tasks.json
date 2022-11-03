@@ -7,22 +7,22 @@
     "duration": 2750
   },{
     "description": "extract statement data",
-    "duration": 2750
+    "duration": 18000
   },{
     "description": "amortize loan payments",
     "duration": 2573
   },{
     "description": "depreciate fixed assets",
-    "duration": 1500
+    "duration": 7454
   },{
     "description": "calculate payroll allocations",
-    "duration": 3643
+    "duration": 37473
   },{
     "description": "generate month end report",
-    "duration": 2573
+    "duration": 34332
   },{
     "description": "audit for discrepancies",
-    "duration": 1500
+    "duration": 6765
   },{
     "description": "close the books",
     "duration": 3643
