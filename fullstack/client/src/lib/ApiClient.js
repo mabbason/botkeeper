@@ -39,7 +39,7 @@ const apiClient = {
   deleteBot: async (bot) => {
     const URL = BASE_URL + 'bots'
     try {
-      const { data } = await axios.delete(URL, { data: bot })
+      const data = await axios.delete(URL, { data: bot })
       return data;
     } catch (e) {
       logError(e);

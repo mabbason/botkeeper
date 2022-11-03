@@ -1,5 +1,6 @@
+const allBots = require('../model/bots.json');
 const botsDB = {
-  bots: require('../model/bots.json'),
+  bots: allBots,
   setBots: function (data) { this.bots = data }
 }
 const fsPromises = require('fs').promises;
@@ -7,7 +8,15 @@ const path = require('path');
 
 
 const getAllBots = async (req, res) => {
-  res.json(botsDB.bots);
+  try {
+    res.json(botsDB.bots);
+  } catch(err) {
+    console.log(err)
+    await fsPromises.writeFile(
+      path.join(__dirname, '..', 'model', 'bots.json'),
+      JSON.stringify([])
+    );
+  } 
 }
 
 const createNewBot = async (req, res) => {
@@ -20,6 +29,10 @@ const createNewBot = async (req, res) => {
       name: req.body.name,
     }
 
+    if (botsDB.bots.find(b => b.name === req.body.name)) {
+      return res.status(400).json({ 'message': 'Name is already taken.'})
+    }
+
     botsDB.setBots([...botsDB.bots, newBot]);
     await fsPromises.writeFile(
       path.join(__dirname, '..', 'model', 'bots.json'),
@@ -28,6 +41,10 @@ const createNewBot = async (req, res) => {
     res.status(201).json(botsDB.bots);
   } catch(err) {
     console.error(err)
+    await fsPromises.writeFile(
+      path.join(__dirname, '..', 'model', 'bots.json'),
+      JSON.stringify([])
+    );
   }
 }
 
@@ -46,11 +63,19 @@ const deleteBot = async (req, res) => {
 
   const botsDBWithoutBot = botsDB.bots.filter(b => b.id !== deleteId);
   botsDB.setBots([...botsDBWithoutBot]);
-  await fsPromises.writeFile(
-    path.join(__dirname, '..', 'model', 'bots.json'),
-    JSON.stringify(botsDB.bots)
-  );
-  res.json(botsDB.bots);
+  try{
+    await fsPromises.writeFile(
+      path.join(__dirname, '..', 'model', 'bots.json'),
+      JSON.stringify(botsDB.bots)
+    );
+    res.status(204).send();
+  } catch(err) {
+    console.log(err)
+    await fsPromises.writeFile(
+      path.join(__dirname, '..', 'model', 'bots.json'),
+      JSON.stringify([])
+    );
+  }
 }
 
 module.exports = {

@@ -1,4 +1,3 @@
-import './App.css';
 import { useState, useEffect } from 'react';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -10,8 +9,6 @@ import BotForm from './components/BotForm';
 import TaskQueue from './components/TaskQueue';
 import Bot from './components/Bot';
 import apiClient from './lib/ApiClient';
-import { useMsgs, useMsgsUpdate } from './MsgsContext';
-
 
 const theme = createTheme({
   palette: {
@@ -21,14 +18,12 @@ const theme = createTheme({
   }
 })
 
-
-
 function App() {
   const [ tasks, setTasks ] = useState([]);
   const [ bots, setBots ] = useState([]);
   const [ queueIsRunning, setQueueIsRunning ] = useState(false);
-  const msgs = useMsgs();
-  const updateMsgs = useMsgsUpdate();
+  const [ msgs, setMsgs ] = useState([]);
+
 
   useEffect(() => {
     const getAllTasks = async () => {
@@ -79,7 +74,7 @@ function App() {
     setQueueIsRunning(true)
 
     socket.on('botMsg', (bot, data) => {
-      updateMsgs(prev => { 
+      setMsgs(prev => { 
         const newData = {
           bot,
           data,
@@ -96,12 +91,16 @@ function App() {
 
   const handleRunQueue = (event) => {
     event.preventDefault();
-    updateMsgs([])
-    try {
-      apiClient.runTaskQueue(handleEventStream)
-    } catch(err) {
-      console.log(err);
-    }  
+    setMsgs([])
+    if (bots.length > 0) {
+      try {
+        apiClient.runTaskQueue(handleEventStream)
+      } catch(err) {
+        console.log(err);
+      }  
+    } else {
+      alert('You need to add Bots to your team first!');
+    }
   }
 
   const handleResetQueue = async (event) => {
@@ -115,13 +114,15 @@ function App() {
     } catch(err) {
       console.log(err)
     }
-    updateMsgs([])
+    setMsgs([])
   }
 
   const handleDeleteBot = async (bot) => {
     try {
-      const newBotTeam = await apiClient.deleteBot(bot);
-      setBots(newBotTeam);
+      await apiClient.deleteBot(bot);
+      const botsWithoutDeleted = bots.filter(b => b.id !== bot.id);
+      console.log(botsWithoutDeleted);
+      setBots(botsWithoutDeleted);
     } catch(err) {
       console.log(err)
     }
@@ -150,14 +151,15 @@ function App() {
               handleResetQueue={handleResetQueue}
             />
             <BotForm queueIsRunning={queueIsRunning} handleSubmit={handleSubmit} />
-              {
-                bots.map(bot => <Bot 
+              { bots?.length > 0 
+                ? bots.map(bot => <Bot 
                                   key={bot.id} 
                                   bot={bot} 
                                   msgs={msgs}
                                   queueIsRunning={queueIsRunning}
                                   handleDeleteBot={handleDeleteBot}
                                 />)
+                : <p>Please add bots to your team in order to run the task queue.</p>
               }     
           </Grid>
         </Container>

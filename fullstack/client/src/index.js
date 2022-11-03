@@ -2,13 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import { MsgsProvider } from './MsgsContext';
+// import { MsgsProvider } from './MsgsContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   // <React.StrictMode>
-    <MsgsProvider>
+    // <MsgsProvider>
       <App />
-    </MsgsProvider>
+    // </MsgsProvider>
   // </React.StrictMode>
 );
