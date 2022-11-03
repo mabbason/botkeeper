@@ -19,6 +19,7 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
+    "jest": "^29.2.2",
     "nodemon": "^2.0.20"
   }
 }

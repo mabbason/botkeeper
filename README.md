@@ -4,6 +4,12 @@ This repo is Miles Abbason's work for completing the Botkeeper coding challenge.
 
 ## Overall Logic
 The overall decision to handle 'task running' is the same between the CLI program and the Fullstack version (I wasn't originally planning for both). 
+- The overall idea sounded like it would be good for a recurring task queue. The mental model I thought of was the user creates a "team of bots" which processes the task queue until it is done.
+- "Allow any number of bots by giving each a name". This with the second requirement of "it should be assigned 2 tasks" I interpreted in the following way:
+  - The team of bots is created separately from dividing the the tasks up. When the task queue is run, the tasks are given out 2 at a time to each bot, until the tasks run out, at which point if the user created more than 5 bots in this case, the additional bots would be idling while the first 5 run the task queue.
+  - If a single bot is running the task queue, then it takes two tasks, and works until it completes one, at which point it takes another from the queue and so on until it completes processing of the entire queue.
+  - for two bots, the same expect that 4 tasks are initially given out, then each proceeds through the queue.
+  - no tasks are removed from the queue until the "time" has expired for that task.
 
 ## CLI Program
 
@@ -12,10 +18,13 @@ CLI program the first day when I had a couple simple ideas I was messing around
 with and I realized it would only take just a teensie bit more effort to turn it
 into a CLI program.
 
-The CLI program is run in NodeJS by `cd` in the `cli-program` directory and
-running `node botRunner`.
+The CLI program is run in NodeJS by `cd` into the `cli-program` directory running `npm install` and then running `node botRunner` for each time to run the program.
 
 ## Fullstack
+
+The fullstack program is run by `cd` into `fullstack/server` folder, and run `npm install` then running `npm run dev`, this will start the server on port 5001 and restart it for changes to the backend. Keep that terminal window open while opening a second terminal to start the frontend. `cd` into `fullstack/client` folder and run `npm install` and run `npm start`. This should autimatically open a browser window with the frontend app running in it. If it doesn't, then open a browser window and navigate to `http://localhost:3000`. 
+
+During the course of running the fullstack app, websocket connections will be made over port 5002. Typically there shouldn't be any conflicts but if there are that may be why.
 
 ### Event Streaming
 

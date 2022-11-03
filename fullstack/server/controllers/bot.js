@@ -5,7 +5,7 @@ class Bot {
     this.queue = queue;
     this.running = running;
     this.maxTasks = maxTasks;
-    this.numOfBotsWorking = (queue.length / maxTasks) + (queue.length % maxTasks);
+    this.maxBotsWorking = (queue.length / maxTasks) + (queue.length % maxTasks);
   }
 
   runSingleTask(task, index) {
@@ -34,8 +34,9 @@ class Bot {
     this.running.splice(completedIdx, 1)
   }
 
-  checkForDisconnect(socket, isDone) {
-    if (isDone.length >=  this.numOfBotsWorking) {
+  checkForDisconnect(socket, isDone, botTeam) {
+    const done = isDone.length;
+    if (done >= botTeam.length || done >= this.maxBotsWorking) {
       socket.disconnect();
     }
   }
