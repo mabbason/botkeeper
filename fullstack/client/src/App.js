@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import AppBar from '@mui/material/AppBar';
@@ -26,6 +26,7 @@ const theme = createTheme({
 function App() {
   const [ tasks, setTasks ] = useState([]);
   const [ bots, setBots ] = useState([]);
+  const [ queueIsRunning, setQueueIsRunning ] = useState(false);
   const msgs = useMsgs();
   const updateMsgs = useMsgsUpdate();
 
@@ -56,46 +57,46 @@ function App() {
     getAllBots();
   }, [])
 
-  const msgsRef = useRef();
-
   useEffect(() => {
-    msgsRef.current = msgs;
-  }, [msgs]);
+    setTasks(tasks.filter(t => !msgs.find(m => m.data.message.includes(t.description))));
+  }, [msgs, tasks]);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const botName = event.target.botName.value;
-    
-    
+    const form = event.target;
+    const botName = form.botName.value;
+    try {
+      const newBotTeam = await apiClient.createNewBot(botName);
+      setBots(newBotTeam);
+      form.botName.value = ''; 
+    } catch(err) {
+      console.log(err)
+    }
   }
 
   const handleEventStream = (socket) => {
-    // console.log("msgsRef", msgsRef.current);
     socket.emit('runTaskQueue');
-    
-    const botsDone = [];
+    setQueueIsRunning(true)
+
     socket.on('botMsg', (bot, data) => {
-      console.log(bot.name, data.message);
+      updateMsgs(prev => { 
+        const newData = {
+          bot,
+          data,
+          id: prev.length + 1,
+        };
+        return [...prev, newData ]; 
+      });
+    })
 
-      //I think my issue is here... I want to track the incoming messages
-      // but it won't save my messages.
-      updateMsgs([...msgs, { bot, data }])
-
-      if (data.message === 'Completed all tasks!') {
-        botsDone.push(bot.name);
-        if (botsDone.length === bots.length) {
-          socket.disconnect();
-          console.log(botsDone);
-        }
-      }
+    socket.on('disconnect', () => {
+      setQueueIsRunning(false)
     })
   }
 
   const handleRunQueue = (event) => {
     event.preventDefault();
-    // msgsRef.current = [];
-    updateMsgs([]);
-    console.log('Running Queue')
+    updateMsgs([])
     try {
       apiClient.runTaskQueue(handleEventStream)
     } catch(err) {
@@ -103,8 +104,30 @@ function App() {
     }  
   }
 
-  
+  const handleResetQueue = async (event) => {
+    event.preventDefault();
+    try {
+      let tasks = await apiClient.getAllTasks();
+      tasks = tasks.map((t, idx) => { 
+        return { ...t, id: idx+1}
+      });
+      setTasks(tasks)
+    } catch(err) {
+      console.log(err)
+    }
+    updateMsgs([])
+  }
 
+  const handleDeleteBot = async (bot) => {
+    try {
+      const newBotTeam = await apiClient.deleteBot(bot);
+      setBots(newBotTeam);
+    } catch(err) {
+      console.log(err)
+    }
+  }
+
+  
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
@@ -120,10 +143,21 @@ function App() {
         </AppBar>
         <Container>
           <Grid container direction="row">
-            <TaskQueue tasks={tasks} handleRunQueue={handleRunQueue} />
-            <BotForm handleSubmit={handleSubmit}></BotForm>
+            <TaskQueue 
+              tasks={tasks}
+              queueIsRunning={queueIsRunning}
+              handleRunQueue={handleRunQueue}
+              handleResetQueue={handleResetQueue}
+            />
+            <BotForm queueIsRunning={queueIsRunning} handleSubmit={handleSubmit} />
               {
-                bots.map(bot => <Bot key={bot.id} name={bot.name} />) //completedTasks={msgsRef.current}
+                bots.map(bot => <Bot 
+                                  key={bot.id} 
+                                  bot={bot} 
+                                  msgs={msgs}
+                                  queueIsRunning={queueIsRunning}
+                                  handleDeleteBot={handleDeleteBot}
+                                />)
               }     
           </Grid>
         </Container>

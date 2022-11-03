@@ -6,9 +6,13 @@ const taskQueue = {
   queue: [],
   running: [],
   botTeam: [],
+  isDone: [],
 
   initTaskQueue(tasks) {
-    this.queue = [...tasks]
+    this.queue = [...tasks];
+    this.running = [];
+    this.botTeam = [];
+    this.isDone = [];
   },
 
   initBotTeam() {
@@ -17,14 +21,14 @@ const taskQueue = {
     });
   },
 
-  activateEachBot(res) {
-    this.botTeam.forEach(bot => bot.run(res))
+  activateEachBot(socket, isDone, botTeam) {
+    this.botTeam.forEach(bot => bot.run(socket, isDone, botTeam))
   },
 
-  run(tasks, res) {
+  run(tasks, socket) {
     this.initTaskQueue(tasks);
     this.initBotTeam();
-    this.activateEachBot(res);
+    this.activateEachBot(socket, this.isDone, this.botTeam);
   }
 }
 

@@ -4,8 +4,8 @@ import Typography from '@mui/material/Typography';
 import Task from './Task';
 import Button from '@mui/material/Button';
 
-const TaskQueue = ({ tasks, handleRunQueue }) => {
-
+const TaskQueue = ({ tasks, queueIsRunning, handleRunQueue, handleResetQueue }) => {
+ 
   return (
     <Grid item sx={{ m: 2 }} xs={12} >
       <Paper elevation={2} sx={{ p: 2 }}>
@@ -28,7 +28,8 @@ const TaskQueue = ({ tasks, handleRunQueue }) => {
             }
           </Grid> 
         </Grid>
-        <Button variant="contained" type="button" onClick={handleRunQueue}>Run Task Queue</Button>   
+        <Button variant="contained" disabled={queueIsRunning} onClick={handleRunQueue} >Run Task Queue</Button>   
+        <Button variant="contained" disabled={queueIsRunning} onClick={handleResetQueue} >Reset Queue</Button>
       </Paper>
     </Grid>
   );

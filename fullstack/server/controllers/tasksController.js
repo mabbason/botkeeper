@@ -3,12 +3,21 @@ const io = require('socket.io')(5002, {
     origin: ['http://localhost:3000'],
   }
 })
-const data = {};
-data.tasks = require('../model/tasks.json');
+const tasksDB = {
+  tasks: require('../model/tasks.json'),
+  setTasks: function (data) { this.tasks = data }
+}
+// const fsPromises = require('fs').promises;
+// const path = require('path');
+// const data = {};
+// data.tasks = require('../model/tasks.json');
 const taskQueue = require('./taskQueue');
 
 const getAllTasks = async (req, res) => {
-  res.json(data.tasks);
+  if (tasksDB.tasks.length !== 10) {
+    console.log("Not all tasks!!!", tasksDB.tasks)
+  }
+  res.json(tasksDB.tasks);
 }
 //SSE Version
 // const runTaskQueue = (req, res) => {
@@ -34,7 +43,10 @@ const getAllTasks = async (req, res) => {
 //WebSocket Version
 io.on("connection", (socket) => {
   console.log(`New socket connection @ ${socket.id}`);
-  const tasks = require('../model/tasks.json');
+  const tasks = tasksDB.tasks;
+  if (tasks.length !== 10) {
+    console.log("Not all tasks!!!", tasks)
+  }
 
   socket.on('runTaskQueue', () => {
     console.log(`Run task queue connection opened...`);

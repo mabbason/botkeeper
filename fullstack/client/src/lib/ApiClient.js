@@ -54,25 +54,7 @@ const apiClient = {
       logError(e);
     }
   },
-  // SSE Version
-  // runTaskQueue: async (bots, handleEventStream) => {
-  //   console.log("Invoking runTaskQueue")
-  //   const URL = BASE_URL + 'tasks/run'
-  //   const completed = [];
-  //   const source = new EventSource(URL);
-  //   source.onmessage = (e) => {
-  //     handleEventStream(e.data);
-  //     console.log(e.data);
-  //     if (e.data.includes('all tasks completed')) {
-  //       completed.push(e.data);
-  //       if (completed.length === bots.length) {
-  //         source.close()
-  //       }
-  //     }
-  //   }
-  // },
-  runTaskQueue: async (handleEventStream) => { // WebSockets version
-    console.log("Invoking runTaskQueue")
+  runTaskQueue: async (handleEventStream) => {
     const socket = await io.connect('http://localhost:5002');
     handleEventStream(socket);
   },

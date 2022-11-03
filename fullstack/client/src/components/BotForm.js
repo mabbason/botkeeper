@@ -7,7 +7,7 @@ import InputLabel from '@mui/material/InputLabel';
 import FilledInput from '@mui/material/FilledInput';
 import Button from '@mui/material/Button';
 
-const BotForm = ({ handleSubmit }) => {
+const BotForm = ({ queueIsRunning, handleSubmit }) => {
   const [name, setName] = useState('');
 
   const handleChange = (event) => {
@@ -31,7 +31,7 @@ const BotForm = ({ handleSubmit }) => {
               onChange={handleChange}
             />
           </FormControl>
-          <Button variant="contained" type="submit">Submit</Button>          
+          <Button variant="contained" disabled={queueIsRunning} type="submit">Submit</Button>          
         </form>
       </Paper>
     </Grid>

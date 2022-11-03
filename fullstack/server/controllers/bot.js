@@ -32,8 +32,14 @@ class Bot {
     const completedIdx = this.running.findIndex(curr => task.description === curr.description);
     this.running.splice(completedIdx, 1)
   }
+
+  checkForDisconnect(socket, isDone, botTeam) {
+    if (isDone.length === botTeam.length) {
+      socket.disconnect();
+    }
+  }
   
-  async run(socket) {  
+  async run(socket, isDone, botTeam) {  
     //Initial load of tasks for bot into internal queue
     while (this.queue.length > 0 && this.activeTasks.length < this.maxTasks) {
       let currIdx = this.activeTasks.length;
@@ -43,30 +49,37 @@ class Bot {
     }
   
     //Ongoing processing of completeing and aquiring new tasks
+    let completed;
     while (this.queue.length > 0) {
       socket.on('disconnect', () => {
         this.queue = [];
       })
       try {
-        let completed = await Promise.race(this.activeTasks)
+        completed = await Promise.race(this.activeTasks)
         this.completeTask(completed.task);
-        // res.write(`data: ${this.name} completed task: ${completed.task.description}\n\n`)
-        socket.emit('botMsg', { name: this.name },  { message:`Completed ${completed.task.description}` })
-        console.log(`${this.name} completed task: ${completed.task.description}`)  
-  
+
+        socket.emit('botMsg', { name: this.name },  { message:`Completed ${completed.task.description}` })       
+        let idx = completed.index; 
         let nextTask = this.getNextTask();
-        if(!nextTask) break;
+        if(!nextTask) {
+          this.activeTasks.splice(idx, 1);
+          break;
+        }
   
-        let idx = completed.index;     
+            
         this.activeTasks[idx] = this.runSingleTask(nextTask, idx)  
       } catch(err) {
         console.log(err)
       }
     }
-    await Promise.all(this.activeTasks);
-    // res.write(`data: ${this.name}: all tasks completed! \n\n`);
+    completed = await Promise.all(this.activeTasks);
+    socket.emit('botMsg', { name: this.name },  { message:`Completed ${completed[0].task.description}` })
+    
     socket.emit('botMsg', { name: this.name },  { message:`Completed all tasks!` })
     console.log(`\nAll tasks completed for ${this.name}`) 
+
+    isDone.push(this.name);
+    this.checkForDisconnect(socket, isDone, botTeam);
   }
 }
 
