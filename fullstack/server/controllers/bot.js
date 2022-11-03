@@ -33,36 +33,40 @@ class Bot {
     this.running.splice(completedIdx, 1)
   }
   
-  async run(res) {  
+  async run(socket) {  
     //Initial load of tasks for bot into internal queue
     while (this.queue.length > 0 && this.activeTasks.length < this.maxTasks) {
       let currIdx = this.activeTasks.length;
       let task = this.getNextTask();
       if (!task) break;
       this.activeTasks[currIdx] = this.runSingleTask(task, currIdx);
-      
-      res.write(`${this.name} working on ${task.description}\n`)
     }
   
     //Ongoing processing of completeing and aquiring new tasks
     while (this.queue.length > 0) {
+      socket.on('disconnect', () => {
+        this.queue = [];
+      })
       try {
         let completed = await Promise.race(this.activeTasks)
         this.completeTask(completed.task);
-        res.write(`${this.name} completed ${completed.task.description}`)
+        // res.write(`data: ${this.name} completed task: ${completed.task.description}\n\n`)
+        socket.emit('botMsg', { name: this.name },  { message:`Completed ${completed.task.description}` })
+        console.log(`${this.name} completed task: ${completed.task.description}`)  
   
         let nextTask = this.getNextTask();
         if(!nextTask) break;
   
         let idx = completed.index;     
-        this.activeTasks[idx] = this.runSingleTask(nextTask, idx)
-        res.write(`${this.name} working on ${nextTask.description}\n`)      
+        this.activeTasks[idx] = this.runSingleTask(nextTask, idx)  
       } catch(err) {
         console.log(err)
       }
     }
     await Promise.all(this.activeTasks);
-    res.write(`\nAll tasks completed for ${this.name}`);
+    // res.write(`data: ${this.name}: all tasks completed! \n\n`);
+    socket.emit('botMsg', { name: this.name },  { message:`Completed all tasks!` })
+    console.log(`\nAll tasks completed for ${this.name}`) 
   }
 }
 

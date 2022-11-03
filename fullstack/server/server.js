@@ -1,18 +1,20 @@
 const express = require('express');
+const http = require('http');
 const path = require('path');
-const { logger } = require('./middleware/logEvents');
 const { errorHandler } = require('./middleware/errorHandler')
 const cors = require('cors');
-const corsOptions = require('./config/corsOptions');
+// const corsOptions = require('./config/corsOptions');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+const server = http.createServer(app);
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
 
 app.use('/', express.static(path.join(__dirname, '/public')));
 app.use('/bots', require('./routes/api/bots'));
@@ -31,4 +33,8 @@ app.all('*', (req, res) => {
 
 app.use(errorHandler)
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+

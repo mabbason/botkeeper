@@ -1,0 +1,2 @@
+20221102	13:13:09	af8ae67c-0d91-4653-b2c5-9fc20eea3859	Error: Not allowed by CORS
+20221102	13:13:09	d069d2db-39b9-4d63-b652-90fd8d611d63	Error: Not allowed by CORS
