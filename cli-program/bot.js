@@ -40,14 +40,13 @@ class Bot {
       let task = this.getNextTask();
       if (!task) break;
       this.activeTasks[currIdx] = this.runSingleTask(task, currIdx);
-      
-      console.log(`${this.name} working on ${task.description}\n`)
     }
   
     //Ongoing processing of completeing and aquiring new tasks
+    let completed;
     while (this.queue.length > 0) {
       try {
-        let completed = await Promise.race(this.activeTasks)
+        completed = await Promise.race(this.activeTasks)
         this.completeTask(completed.task);
         console.log(`${this.name} completed ${completed.task.description}`)
   
@@ -55,13 +54,14 @@ class Bot {
         if(!nextTask) break;
   
         let idx = completed.index;     
-        this.activeTasks[idx] = this.runSingleTask(nextTask, idx)
-        console.log(`${this.name} working on ${nextTask.description}\n`)      
+        this.activeTasks[idx] = this.runSingleTask(nextTask, idx)    
       } catch(err) {
         console.log(err)
       }
     }
-    await Promise.all(this.activeTasks);
+    completed = await Promise.all(this.activeTasks);
+    console.log(`${this.name} completed ${completed[0].task.description}`)
+
     console.log(`\nAll tasks completed for ${this.name}`);
   }
 
