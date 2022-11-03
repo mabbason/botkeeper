@@ -42,6 +42,7 @@ I thought I would give it a go with Material UI, having never worked with it bef
 
 This probably ended up being my biggest mistake. The project didn't really seem like it needed a "real" database so I just used a simple fs.write operation to update a json. This mostly works fine... mostly. But there is a persistent (and inconsistent) bug that I don't think will be solved unless it is hooked up to a real database. Hindsight it wouldn't have taken that long to get Mongo going, but I was trying for expediency and it cost a little in the end.
 
+
 ### Additional Work
 
 #### Testing
@@ -51,3 +52,11 @@ The testing is really thin. I am not familiar with testing MUI components, or if
 #### Validation
 
 I really wanted to throw the joi validation library in here since Mike mentioned it, but I just didn't have time to go back and add it in. The validation in both apps is minimal. By minimal I mean that for inputing the bot name on the fullstack app, I force the user to only enter letter characters. Also in the cli app, the inputs are stripped out to letter characters and commas only to force a type of validation.
+
+#### Bug Squashing
+
+**Persistent Bug** Sometimes there will be an error when deleteing a bot. It usually means that the `server/model/bots.json` file *cough *cough, database has been emptied. This is from not standing up a real DB. You can just throw an empty array in the file and save it. Restart the server and it should be cracking along again.
+
+### Final Notes
+
+Thank you guys, it was fun, I hope you enjoy my interpretations of the coding challenge!
